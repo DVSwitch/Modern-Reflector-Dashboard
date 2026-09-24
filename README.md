@@ -22,12 +22,12 @@ To ensure all features (including the ID database and Pretty URLs) work correctl
 - `php-mbstring` (for international character support)
 
 **Ubuntu/Debian Installation Example:**  
-*Install the unversioned meta-packages so APT pulls your distro's current default PHP (8.3 on Debian 13 / Ubuntu 24.04, 8.4 on newer Ubuntu). Avoid pinning to an old version like `php8.2-*`.*
+*Install the unversioned meta-packages so APT pulls your distro's current default PHP (8.5 on Ubuntu 26.04, 8.3 on Debian 13 / Ubuntu 24.04). Avoid pinning to an old version like `php8.2-*`.*
 ```bash
 sudo apt install php-cli php-sqlite3 php-curl php-mbstring
 # After installing, make sure to restart your web server processor!
-# (Match the service name to the PHP version APT installed, e.g., php8.3-fpm / php8.4-fpm)
-sudo systemctl restart php-fpm
+sudo systemctl restart php8.5-fpm
+# (Use the version APT installed, e.g., php8.3-fpm on Ubuntu 24.04)
 # OR
 sudo systemctl restart apache2
 ```
