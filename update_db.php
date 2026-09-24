@@ -40,7 +40,7 @@ foreach ($sources as $type => $url) {
     $stmt = $db->prepare("INSERT INTO users (id, callsign, name, city, state, country) VALUES (:id, :call, :name, :city, :state, :country)");
     
     $count = 0;
-    while (($data = fgetcsv($handle)) !== FALSE) {
+    while (($data = fgetcsv($handle, 0, ',', '"', '\\')) !== FALSE) {
         if (!is_numeric($data[0])) continue; // Skip headers
 
         $stmt->bindValue(':id', (int)$data[0]);

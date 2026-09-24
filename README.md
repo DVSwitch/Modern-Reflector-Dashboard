@@ -22,11 +22,12 @@ To ensure all features (including the ID database and Pretty URLs) work correctl
 - `php-mbstring` (for international character support)
 
 **Ubuntu/Debian Installation Example:**  
-*Note: Make sure to match the PHP version to your operating system's default (e.g., `php8.2-*` for Debian 12, or `php8.3-*` for newer Ubuntu systems).*
+*Install the unversioned meta-packages so APT pulls your distro's current default PHP (8.3 on Debian 13 / Ubuntu 24.04, 8.4 on newer Ubuntu). Avoid pinning to an old version like `php8.2-*`.*
 ```bash
-sudo apt install php8.2-sqlite3 php8.2-curl php8.2-mbstring
+sudo apt install php-cli php-sqlite3 php-curl php-mbstring
 # After installing, make sure to restart your web server processor!
-sudo systemctl restart php8.2-fpm
+# (Match the service name to the PHP version APT installed, e.g., php8.3-fpm / php8.4-fpm)
+sudo systemctl restart php-fpm
 # OR
 sudo systemctl restart apache2
 ```
@@ -35,7 +36,7 @@ sudo systemctl restart apache2
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/N4IRS/Modern-Reflector-Dashboard
+   git clone https://github.com/DVSwitch/Modern-Reflector-Dashboard
    cd Modern-Reflector-Dashboard
    ```
 
