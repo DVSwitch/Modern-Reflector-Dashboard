@@ -1,4 +1,6 @@
 <?php
+require __DIR__ . '/version.php';
+
 // Multi-Config discovery
 $conf = isset($_GET['conf']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['conf']) : 'config';
 $configFile = __DIR__ . "/config/{$conf}.php";
@@ -232,7 +234,7 @@ foreach ($allConfigs as $c) {
                         <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
                             Reflector by G4KLX<br>
                             Dashboard by DVSwitch<br>
-                            <span style="opacity: 0.6">Inspired by the original dashboard project</span>
+                            <span style="opacity: 0.6">v<?php echo DASHBOARD_VERSION; ?></span>
                         </p>
                     </div>
                 <?php endif; ?>

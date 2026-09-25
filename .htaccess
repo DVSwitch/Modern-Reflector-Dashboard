@@ -1,6 +1,10 @@
 # DVSwitch Modern Dashboard URL Rewriting
 RewriteEngine On
 
+# Block direct access to sensitive directories:
+# config/ holds per-installation PHP profiles, db/ holds the user ID database.
+RewriteRule ^(config|db)(/|$) - [F,L]
+
 # Allow direct access to real files and directories
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -9,3 +13,11 @@ RewriteRule ^ - [L]
 # Redirect paths to the dashboard configuration
 # Example: /P25_NA -> index.php?conf=P25_NA
 RewriteRule ^([^/]+)/?$ index.php?conf=$1 [QSA,L]
+
+# --- Security Headers ---
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+</IfModule>

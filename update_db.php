@@ -4,6 +4,8 @@
  * Downloads DMR and NXDN user databases and builds a local SQLite cache.
  */
 
+if (php_sapi_name() !== 'cli') { http_response_code(403); die(); } // CLI only
+
 // Configuration
 $dbFile = __DIR__ . "/db/users.db";
 $sources = [

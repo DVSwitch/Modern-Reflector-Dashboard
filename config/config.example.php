@@ -1,21 +1,27 @@
 <?php
 /**
- * DVSwitch Universal Reflector Dashboard Configuration
- * Created via Interactive Setup on 2026-04-15 20:14:41
+ * DVSwitch Universal Reflector Dashboard Configuration (EXAMPLE)
+ *
+ * This is the tracked template. Copy it to config/config.php (or any
+ * config/<ProfileName>.php) and edit the values, or simply run:
+ *
+ *   php setup.php /opt
+ *
+ * Every config/*.php file becomes a switchable profile in the dashboard.
  */
 
 date_default_timezone_set('UTC');
 
 // --- 1. Branding & Identity ---
-define("DASHBOARD_TITLE", "P25 North America Reflector");
+define("DASHBOARD_TITLE", "P25 Reflector");
 define("DASHBOARD_SUBTITLE", "Real-time P25 Monitoring");
 define("LOGO", "DVSwitch.png");
 
 // --- 2. Reflector Connection ---
-define("REFLECTOR_LOG_PREFIX", "P25_NA_Reflector");
+define("REFLECTOR_LOG_PREFIX", "P25Reflector");
 define("REFLECTOR_LOG_PATH", "/var/log/mmdvm");
 define("REFLECTOR_INI_PATH", "/opt/P25Reflector/");
-define("REFLECTOR_INI_FILE", "P25_NA_Reflector.ini");
+define("REFLECTOR_INI_FILE", "P25Reflector.ini");
 define("REFLECTOR_BIN_PATH", "/opt/P25Reflector/");
 
 // --- 3. UI Features ---
