@@ -48,7 +48,7 @@ foreach ($allConfigs as $c) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P25Reflector Dashboard | Modern</title>
+    <title><?php echo DASHBOARD_TITLE; ?> | Modern</title>
     <link rel="stylesheet" href="index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

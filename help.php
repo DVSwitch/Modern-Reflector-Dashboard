@@ -7,7 +7,7 @@ $readmeContent = file_exists('README.md') ? file_get_contents('README.md') : '# 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help - P25Reflector</title>
+    <title><?php echo $title; ?></title>
     <link rel="stylesheet" href="index.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
