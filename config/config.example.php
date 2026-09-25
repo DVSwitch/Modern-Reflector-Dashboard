@@ -22,7 +22,6 @@ define("REFLECTOR_LOG_PREFIX", "P25Reflector");
 define("REFLECTOR_LOG_PATH", "/var/log/mmdvm");
 define("REFLECTOR_INI_PATH", "/opt/P25Reflector/");
 define("REFLECTOR_INI_FILE", "P25Reflector.ini");
-define("REFLECTOR_BIN_PATH", "/opt/P25Reflector/");
 
 // --- 3. UI Features ---
 define("SHOWQRZ", "1");

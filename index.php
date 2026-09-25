@@ -22,8 +22,10 @@ if (file_exists($configFile)) {
 $allConfigs = glob(__DIR__ . "/config/*.php");
 $reflectors = [];
 foreach ($allConfigs as $c) {
-    if (basename($c) === 'config.php' && count($allConfigs) > 3)
+    if (basename($c) === 'config.php' && count($allConfigs) > 1)
         continue; // Skip generic config if we have real ones
+    if (basename($c) === 'config.example.php')
+        continue; // Never list the template as a switcher profile
 
     $cName = basename($c, '.php');
     $lines = file($c);
@@ -249,7 +251,7 @@ foreach ($allConfigs as $c) {
             let containerClass = isDown ? "callsign-container tooltip-down" : "callsign-container";
             let html = `<div class="${containerClass}">`;
             if (SHOW_QRZ) {
-                html += `<a href="https://qrz.com/db/${call}" target="_blank" class="callsign" style="text-decoration: none; color: var(--accent-primary)">${call}</a>`;
+                html += `<a href="https://qrz.com/db/${encodeURIComponent(call)}" target="_blank" class="callsign" style="text-decoration: none; color: var(--accent-primary)">${call}</a>`;
             } else {
                 html += `<span class="callsign">${call}</span>`;
             }
@@ -271,8 +273,6 @@ foreach ($allConfigs as $c) {
             html += `</div>`;
             return html;
         }
-        const CURRENT_CONF = "<?php echo $conf; ?>";
-
         async function updateDashboard() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);

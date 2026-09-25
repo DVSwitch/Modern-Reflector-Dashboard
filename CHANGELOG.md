@@ -13,11 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mode badge colors for P25, YSF, NXDN and DMR (`index.css`).
 - `version.php` exposing `DASHBOARD_VERSION`.
 - GitHub Actions lint workflow (`php -l`), Dependabot config, and a bug report issue template.
+- `LICENSE` (GPL-2.0).
+- SRI `integrity` hash for the pinned `marked@12.0.2` CDN script in `help.php`.
 
 ### Fixed
 - `update_db.php` now refuses to run from the web (CLI-only), matching `setup.php`.
 - PHP 8.4 PCRE/CSV compatibility: `fgetcsv()` now passes the `$escape` argument explicitly.
 - Browser page titles no longer hardcoded to P25Reflector (`index.php`, `help.php`).
+- XSS in `help.php`: README content is embedded into the page with `JSON_HEX_TAG|AMP|APOS|QUOT`.
+- QRZ links URL-encode the callsign (portable calls such as `N4IRS/P` now link correctly).
+- `setup.php` prompts before overwriting an existing config instead of clobbering it.
+- `index.php` no longer uses a magic `count > 3` threshold to hide the generic config; removed unused `CURRENT_CONF`.
+- Dropped unused `REFLECTOR_BIN_PATH` config define.
+
+### Performance
+- `api.php` reuses a single prepared SQLite statement and caches lookups per request.
+- `api.php` caches the JSON payload for `API_REFRESH_INTERVAL` (atomically written) so concurrent polls don't each rescan the logs.
 
 ## [3.3] - 2026-04-15
 

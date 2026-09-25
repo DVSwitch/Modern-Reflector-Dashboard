@@ -9,7 +9,7 @@ $readmeContent = file_exists('README.md') ? file_get_contents('README.md') : '# 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title; ?></title>
     <link rel="stylesheet" href="index.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
     <style>
         .markdown-body {
             color: #e2e8f0;
@@ -77,7 +77,7 @@ $readmeContent = file_exists('README.md') ? file_get_contents('README.md') : '# 
 
     <script>
         // Render the localized Markdown directly into the DOM
-        document.getElementById('content').innerHTML = marked.parse(<?php echo json_encode($readmeContent); ?>);
+        document.getElementById('content').innerHTML = marked.parse(<?php echo json_encode($readmeContent, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>);
     </script>
 </body>
 </html>

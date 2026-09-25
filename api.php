@@ -37,17 +37,50 @@ if (class_exists('SQLite3') && file_exists(__DIR__ . "/db/users.db")) {
 
 function getUserInfo($search) {
     global $db;
+    static $stmt = null, $cache = [];
     if (!$db) return null;
-    
+
+    $cacheKey = strtolower(trim($search));
+    if (array_key_exists($cacheKey, $cache)) return $cache[$cacheKey];
+
     try {
-        $query = "SELECT callsign, name, city, state, country FROM users WHERE callsign = :val OR id = :val LIMIT 1";
-        $stmt = $db->prepare($query);
-        if (!$stmt) return null;
+        if ($stmt === null) {
+            $stmt = $db->prepare("SELECT callsign, name, city, state, country FROM users WHERE callsign = :val OR id = :val LIMIT 1");
+            if (!$stmt) return null;
+        } else {
+            $stmt->reset();
+        }
         $stmt->bindValue(':val', $search);
         $res = $stmt->execute();
-        return $res->fetchArray(SQLITE3_ASSOC);
+        $row = $res->fetchArray(SQLITE3_ASSOC);
+        $cache[$cacheKey] = $row ?: null;
+        return $cache[$cacheKey];
     } catch (Exception $e) {
+        $cache[$cacheKey] = null;
         return null;
+    }
+}
+
+/**
+ * File-backed response cache: dedupes repeated log scans (and the per-user
+ * SQLite queries they trigger) when multiple clients poll simultaneously.
+ * Written atomically so concurrent readers never see a partial payload.
+ */
+function apiCacheGet($key, $ttl)
+{
+    $file = sys_get_temp_dir() . "/mrd_" . md5($key) . ".json";
+    if (is_file($file) && (time() - filemtime($file)) < $ttl) {
+        return file_get_contents($file);
+    }
+    return false;
+}
+
+function apiCacheSet($key, $body)
+{
+    $file = sys_get_temp_dir() . "/mrd_" . md5($key) . ".json";
+    $tmp = $file . "." . getmypid() . ".tmp";
+    if (@file_put_contents($tmp, $body) !== false) {
+        @rename($tmp, $file);
     }
 }
 
@@ -363,39 +396,49 @@ function getSystemData()
     return $data;
 }
 
-$data = getDashboardData(REFLECTOR_LOG_PREFIX);
-$data['system'] = getSystemData();
-$data['conf'] = str_replace('_Reflector', '', REFLECTOR_LOG_PREFIX);
+$cacheTtl = defined("API_REFRESH_INTERVAL") ? max(1, (int) API_REFRESH_INTERVAL / 1000) : 2;
+$cacheKey = $configFile . "|" . @filemtime($configFile) . "|" . __DIR__;
 
-// GDPR Callsign Anonymization
-if (defined("GDPR_MODE") && GDPR_MODE == "1") {
-    $mask = function($cs) {
-        if (strlen($cs) <= 2) return $cs;
-        return substr($cs, 0, 2) . str_repeat('*', strlen($cs) - 2);
-    };
-    if (!empty($data['heard'])) {
-        foreach ($data['heard'] as &$h) {
-            $h['callsign'] = $mask($h['callsign']);
-            $h['gateway'] = $mask($h['gateway']);
-            $h['name'] = '';
-            $h['location'] = '';
+$response = apiCacheGet($cacheKey, $cacheTtl);
+if ($response === false) {
+    $data = getDashboardData();
+    $data['system'] = getSystemData();
+    $data['conf'] = str_replace('_Reflector', '', REFLECTOR_LOG_PREFIX);
+
+    // GDPR Callsign Anonymization
+    if (defined("GDPR_MODE") && GDPR_MODE == "1") {
+        $mask = function($cs) {
+            if (strlen($cs) <= 2) return $cs;
+            return substr($cs, 0, 2) . str_repeat('*', strlen($cs) - 2);
+        };
+        if (!empty($data['heard'])) {
+            foreach ($data['heard'] as &$h) {
+                $h['callsign'] = $mask($h['callsign']);
+                $h['gateway'] = $mask($h['gateway']);
+                $h['name'] = '';
+                $h['location'] = '';
+            }
+            unset($h);
         }
-        unset($h);
-    }
-    if (!empty($data['transmitting'])) {
-        $data['transmitting']['callsign'] = $mask($data['transmitting']['callsign']);
-        $data['transmitting']['gateway'] = $mask($data['transmitting']['gateway']);
-        $data['transmitting']['name'] = '';
-        $data['transmitting']['location'] = '';
-    }
-    if (!empty($data['gateways'])) {
-        foreach ($data['gateways'] as &$gw) {
-            $gw['callsign'] = $mask($gw['callsign']);
-            $gw['name'] = '';
+        if (!empty($data['transmitting'])) {
+            $data['transmitting']['callsign'] = $mask($data['transmitting']['callsign']);
+            $data['transmitting']['gateway'] = $mask($data['transmitting']['gateway']);
+            $data['transmitting']['name'] = '';
+            $data['transmitting']['location'] = '';
         }
-        unset($gw);
+        if (!empty($data['gateways'])) {
+            foreach ($data['gateways'] as &$gw) {
+                $gw['callsign'] = $mask($gw['callsign']);
+                $gw['name'] = '';
+            }
+            unset($gw);
+        }
     }
+
+    $response = json_encode(sanitize($data));
+    apiCacheSet($cacheKey, $response);
 }
 
-echo json_encode(sanitize($data));
+header('Cache-Control: no-store');
+echo $response;
 ?>

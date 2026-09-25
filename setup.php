@@ -156,7 +156,6 @@ define("REFLECTOR_LOG_PREFIX", "%s");
 define("REFLECTOR_LOG_PATH", "%s");
 define("REFLECTOR_INI_PATH", "%s/");
 define("REFLECTOR_INI_FILE", "%s");
-define("REFLECTOR_BIN_PATH", "%s/");
 
 define("SHOWQRZ", "1");
 define("SHOW_SYSTEM_STATS", "1");
@@ -177,11 +176,19 @@ EOD;
         $prefix,
         $logPath,
         $r['dir'],
-        $r['file'],
-        $r['dir']
+        $r['file']
     );
 
     $targetFile = __DIR__ . "/config/{$confName}.php";
+
+    if (file_exists($targetFile)) {
+        $overwrite = prompt("  Config {$confName}.php already exists. Overwrite? (y/N)", "n");
+        if (strtolower($overwrite) !== 'y') {
+            echo "  >> Skipping {$confName}.php (existing config kept)\n";
+            continue;
+        }
+    }
+
     file_put_contents($targetFile, $configOutput);
     echo "  >> Generated config/{$confName}.php\n";
 }
